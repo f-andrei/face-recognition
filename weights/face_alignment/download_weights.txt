@@ -1,0 +1,3 @@
+Download weights and place it in this folder
+
+https://huggingface.co/spaces/Norod78/Apocalyptify/blob/e17b1b899d8891e81573e121abeb7aaceb6ea5d7/shape_predictor_5_face_landmarks.dat
