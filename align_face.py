@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 from PIL import Image
 import dlib
-import os
 from helper import *
 
 
@@ -11,14 +10,11 @@ def load_model():
     predictor = dlib.shape_predictor("weights/face_alignment/shape_predictor_5_face_landmarks.dat")
     return detector, predictor
 
-folder_path = "data/test_images/"
-destination_folder = "data/aligned"
 
-
-def align_face(image_file):
-    detector, predictor = load_model()
-    image_path = os.path.join(folder_path, image_file)
+def align_face(image_path: str) -> np.ndarray:
     try:
+        detector, predictor = load_model()
+
         img = cv2.imread(image_path)
 
         # Convert the image to grayscale
@@ -27,10 +23,9 @@ def align_face(image_file):
         # Detect faces in the image
         detected_faces = detector(grayscale_image, 0)
         
-        # If no face is detected, delete the image and return
+        # Checks if a face is detected
         if len(detected_faces) == 0:
-            # os.remove(f"{folder_path}/{img_path}")
-            return f"no face detected for {image_path}"
+            return image_path
 
         # Get the face landmarks
         face_landmarks = predictor(grayscale_image, detected_faces[0])
@@ -73,10 +68,8 @@ def align_face(image_file):
         img = Image.fromarray(img)
         img = np.array(img.rotate(rotation_angle))
 
-        # Save the aligned image)
-        destination_path = os.path.join(destination_folder, image_file)
-        cv2.imwrite(destination_path, img)
-        return destination_path
+        return img
     except Exception as e:
         print(f"Error: {e}")
-    print("finished aligning faces")
+        return image_path
+    
