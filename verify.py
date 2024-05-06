@@ -3,9 +3,12 @@ from keras.layers import Convolution2D, ZeroPadding2D, MaxPooling2D, Flatten, Dr
 import numpy as np
 from keras.preprocessing.image import img_to_array, load_img
 from keras.applications.imagenet_utils import preprocess_input
+from typing import Tuple
 
-
+# Define the VGG Face model
 model = Sequential()
+
+# Add the layers to the model
 model.add(ZeroPadding2D((1,1),input_shape=(224,224, 3)))
 model.add(Convolution2D(64, (3, 3), activation='relu'))
 model.add(ZeroPadding2D((1,1)))
@@ -52,12 +55,12 @@ model.add(Activation('softmax'))
 
 
 class FaceVerification():
-    def __init__(self):
+    def __init__(self) -> None:
         self._model = model
         self._model.load_weights("weights/face_verification/vgg_face_weights.h5")
         self._face_descriptor = Model(inputs=self._model.layers[0].input, outputs=self._model.layers[-2].output)
 
-    def _preprocess_image(self, image):
+    def _preprocess_image(self, image: np.ndarray):
         image = load_img(image, target_size=(224, 224))
         image = img_to_array(image)
         image = np.expand_dims(image, axis=0)
@@ -76,24 +79,16 @@ class FaceVerification():
         euclidean_distance = np.sqrt(euclidean_distance)
         return euclidean_distance
 
-    def verify_face(self, img1_path, img2_path, epsilon=0.35) -> bool:
+    def verify_face(self, img1_path: str, img2_path: str, epsilon: float = 0.3147) -> Tuple[bool, float, float]:
+        # Get the representations of the images
         img1_representation = self._face_descriptor.predict(self._preprocess_image(img1_path))[0,:]
         img2_representation = self._face_descriptor.predict(self._preprocess_image(img2_path))[0,:]
         
+        # Find the cosine similarity and euclidean distance
         cosine_similarity = self._find_cos_similarity(img1_representation, img2_representation)
-        euclidean_distance = self._find_cos_similarity(img1_representation, img2_representation)
+        euclidean_distance = self._find_euclidean_distance(img1_representation, img2_representation)
         
-        print("Cosine similarity: ", cosine_similarity)
-        print("Euclidean distance: ", euclidean_distance)
-        
-        # f = plt.figure()
-        # f.add_subplot(1,2, 1)
-        # plt.imshow(image.load_img(img1_path))
-        # plt.xticks([]); plt.yticks([])
-        # f.add_subplot(1,2, 2)
-        # plt.imshow(image.load_img(img2_path))
-        # plt.xticks([]); plt.yticks([])
-        # plt.show(block=True)
-
-        if cosine_similarity < epsilon: return True
-        return False
+        # Check if the images are of the same person
+        if cosine_similarity < epsilon: return True, cosine_similarity, euclidean_distance
+        return False, cosine_similarity, euclidean_distance
+    
