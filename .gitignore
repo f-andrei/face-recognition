@@ -164,6 +164,4 @@ weights/face_crop/res10_300x300_ssd_iter_140000.caffemodel
 weights/face_crop/deploy.prototxt
 data/lfw/
 data/preprocessed/
-data/aligned/
-data/cropped/
 
