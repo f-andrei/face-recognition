@@ -13,7 +13,7 @@ dlib==19.24.4
 exceptiongroup==1.2.1
 executing==2.0.1
 flatbuffers==24.3.25
-fonttools==4.51.0
+fonttools==4.60.2
 gast==0.4.0
 google-auth==2.29.0
 google-auth-oauthlib==1.2.0
